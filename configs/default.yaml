@@ -1,0 +1,52 @@
+# =============================================================================
+#  configs/default.yaml
+# =============================================================================
+
+device: "mps"
+dtype: "float32"
+
+scenes_dir: "scenes"
+outputs_dir: "outputs"
+
+render:
+  image_width: 800      # FIX: was 400. Higher resolution gives GroundingDINO and
+  image_height: 600     #      SAM2 more signal; rescaling in _load_colmap_cameras
+                        #      ensures project() coords stay consistent.
+  num_views: 24         # FIX: was 8. 8 views is far too few for occluded objects
+                        #      like bonsai branches. Use all available cameras.
+  background: [1.0, 1.0, 1.0]
+  max_gaussians: 200000 # FIX: was 150000. Larger scenes need more Gaussians visible.
+
+segmentation:
+  backbone: "grounded_sam2"
+  grounding_dino:
+    config_path: "checkpoints/grounding_dino/GroundingDINO_SwinT_OGC.py"
+    checkpoint_path: "checkpoints/grounding_dino/groundingdino_swint_ogc.pth"
+    box_threshold: 0.25   # FIX: was 0.30. Lower threshold catches harder objects
+    text_threshold: 0.20  #      like bicycle (semi-transparent) and bonsai (foliage).
+  sam2:
+    checkpoint: "checkpoints/sam2/sam2_hiera_small.pt"
+    model_cfg: "sam2_hiera_s.yaml"
+  sam3:
+    checkpoint: "checkpoints/sam2/sam2_hiera_small.pt"
+    model_cfg: "sam2_hiera_s.yaml"
+
+lifting:
+  score_threshold: 0.15  # FIX: was 0.35. Specular/occluded objects score 0.1-0.25
+                         #      per view. 0.35 threshold kills almost everything.
+  min_views_hit: 2       # keep at 2 — still filters stray background Gaussians
+  alpha_min: 0.005       # FIX: was 0.01. Lower so thin Gaussians (spokes, branches)
+                         #      still count as "appeared" in a view.
+
+editing:
+  recolor_rgb: [1.0, 0.2, 0.2]
+
+evaluation:
+  clip_model: "ViT-B/32"
+  num_eval_views: 1
+
+orbit:
+  num_frames: 24
+  fps: 20
+  elevation_deg: 20.0
+  radius_scale: 1.2

@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Large / generated artifacts (created by setup.sh or at runtime)
+third_party/
+checkpoints/
+scenes/
+outputs/
+debug_out/
+*.ply
+*.splat
+*.pt
+*.pth
+*.ckpt
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Local-only: report and figures (not published)
+assets/
+docs/
+*.pdf
